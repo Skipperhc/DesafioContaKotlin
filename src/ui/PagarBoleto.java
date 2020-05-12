@@ -1,15 +1,18 @@
 package ui;
 
 import busines.ContaBusines;
+import busines.TransferenciaBusines;
 import entity.Conta;
 import entity.ContaCorrente;
+import entity.exceptions.NenhumItemEncontrado;
+import entity.exceptions.NumeroNegativoException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class PagarBoleto extends JFrame{
+public class PagarBoleto extends JFrame {
     private JTextField txtIdConta;
     private JTextField txtNomeConta;
     private JLabel txtIdEncontrado;
@@ -24,11 +27,12 @@ public class PagarBoleto extends JFrame{
     private JButton btnCancelar;
 
     private Conta conta;
-    private ContaBusines mContaBusines;
+    private final ContaBusines mContaBusines;
+    private TransferenciaBusines mTransferenciaBusines;
 
     public PagarBoleto() {
         setContentPane(panelPrincipal);
-        setSize(500,300);
+        setSize(500, 300);
         setVisible(true);
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -38,6 +42,7 @@ public class PagarBoleto extends JFrame{
 
         setListener();
         mContaBusines = new ContaBusines();
+        mTransferenciaBusines = new TransferenciaBusines();
         btnPagar.setEnabled(false);
     }
 
@@ -47,18 +52,19 @@ public class PagarBoleto extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 try {
                     conta = mContaBusines.search(txtIdConta.getText());
+                    txtNomeConta.setText(conta.getNomeCliente());
                     txtIdEncontrado.setText(conta.getId() + "");
                     txtNomeEncontrado.setText(conta.getNomeCliente());
-                    txtSaldoEncontrado.setText(conta.getSaldo()+"");
+                    txtSaldoEncontrado.setText(conta.getSaldo() + "");
                     txtBancoEncontrado.setText(conta.getBanco());
-                    if(conta instanceof ContaCorrente) {
+                    if (conta instanceof ContaCorrente) {
                         ContaCorrente contaCorrente = (ContaCorrente) conta;
-                        txtLimiteEncontrado.setText(contaCorrente.getLimite()+"");
+                        txtLimiteEncontrado.setText(contaCorrente.getLimite() + "");
                     } else {
                         txtLimiteEncontrado.setText("Sem limite");
                     }
                     btnPagar.setEnabled(true);
-                } catch (Exception excp) {
+                } catch (NumberFormatException | NenhumItemEncontrado | NullPointerException excp) {
                     JOptionPane.showMessageDialog(new JFrame(), excp.getMessage());
                 }
             }
@@ -68,11 +74,17 @@ public class PagarBoleto extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    mContaBusines.pagar(txtValorBoleto.getText(), conta);
-                } catch (Exception excp) {
-                    JOptionPane.showMessageDialog(new JFrame(), excp.getMessage());
-                    new PagarBoleto();
+                    mTransferenciaBusines.pagar(txtValorBoleto.getText(), conta);
+                    txtNomeConta.setText(conta.getNomeCliente());
+                    txtIdEncontrado.setText(conta.getId() + "");
+                    txtNomeEncontrado.setText(conta.getNomeCliente());
+                    txtSaldoEncontrado.setText(conta.getSaldo() + "");
+                    txtBancoEncontrado.setText(conta.getBanco());
+                    JOptionPane.showMessageDialog(new JFrame(), "Pagamento efetuado com sucesso");
+                    new Transferencia();
                     dispose();
+                } catch (IllegalArgumentException | NumeroNegativoException excp) {
+                    JOptionPane.showMessageDialog(new JFrame(), excp.getMessage());
                 }
             }
         });

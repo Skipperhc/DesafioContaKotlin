@@ -2,6 +2,9 @@ package ui;
 
 import busines.ContaBusines;
 import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
+import entity.Conta;
+import entity.exceptions.CamposVaziosException;
+import entity.exceptions.NumeroNegativoException;
 import repository.ContaRepository;
 
 import javax.swing.*;
@@ -16,6 +19,7 @@ public class CriarConta extends JFrame{
     private JButton btnCancelar;
     private JButton btnCriarConta;
     private JPanel panelPrincipal;
+    private JTextField txtIdConta;
 
     private ContaBusines mContaBusines;
 
@@ -31,6 +35,7 @@ public class CriarConta extends JFrame{
 
         mContaBusines = new ContaBusines();
         setListener();
+        txtIdConta.setText("" + (Conta.Companion.getQtdContas() + 1));
     }
 
     private void setListener() {
@@ -45,8 +50,9 @@ public class CriarConta extends JFrame{
                     mContaBusines.save(nome, saldo, banco);
                     new TelaInicial();
                     dispose();
-                    throw new Exception("O id da conta é: " + ContaRepository.Companion.lista().size());
-                } catch (Exception excp) {
+                } catch (NumberFormatException excp) {
+                    JOptionPane.showMessageDialog(new JFrame(), "Insira um valor apropriado");
+                } catch (CamposVaziosException | IllegalArgumentException excp) {
                     JOptionPane.showMessageDialog(new JFrame(), excp.getMessage());
                 }
             }

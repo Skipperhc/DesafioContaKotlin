@@ -1,9 +1,11 @@
 package ui;
 
+import busines.ContaBusines;
 import busines.ListagemBusines;
 import entity.Conta;
 import entity.ContaCorrente;
-import repository.ContaRepository;
+import entity.Operacao;
+import entity.exceptions.NenhumItemEncontrado;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,13 +18,16 @@ public class ListarContas extends JFrame{
     private JButton btnListarCorrentes;
     private JButton btnListarPoupancas;
     private JButton btnlistarcontas;
-    private JButton btnListarContasOperacoes;
+    private JButton btnListarOperacoesConta;
     private JTable tableListagem;
     private JButton btnVoltar;
     private JPanel panelPrincipal;
     private JLabel lblFolder;
+    private JTextField txtOperacoesContaId;
 
     private ListagemBusines mlistaconta;
+    private ContaBusines mContaBusines;
+
 
     public ListarContas() {
         setContentPane(panelPrincipal);
@@ -35,6 +40,7 @@ public class ListarContas extends JFrame{
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         mlistaconta = new ListagemBusines();
+        mContaBusines = new ContaBusines();
         setListener();
         loadContas(mlistaconta.listarContas());
     }
@@ -61,10 +67,10 @@ public class ListarContas extends JFrame{
             }
         });
 
-        btnListarContasOperacoes.addActionListener(new ActionListener() {
+        btnListarOperacoesConta.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                listarOperacoes();
             }
         });
 
@@ -75,6 +81,43 @@ public class ListarContas extends JFrame{
                 dispose();
             }
         });
+    }
+
+    private void listarOperacoes() {
+        try {
+            Conta conta = mContaBusines.search(txtOperacoesContaId.getText());
+            String[] columnNomes = {"Id", "Id conta origem", "Id conta destino", "valor"};
+            DefaultTableModel model = new DefaultTableModel(new Object[0][0][0][0], columnNomes);
+
+            Object[] nomeColunas = new Object[4];
+            nomeColunas[0] = "          Id";
+            nomeColunas[1] = "          Id conta origem";
+            nomeColunas[2] = "          Id conta destino";
+            nomeColunas[3] = "          valor da operação";
+            model.addRow(nomeColunas);
+
+            for(Operacao i : conta.getListaOperacao()) {
+                Object[] o = new Object[5];
+                o[0] = i.getId();
+                o[1] = i.getContaIdOrigem();
+                if(i.getContaIdDestino() != 0) {
+                    o[2] = i.getContaIdDestino();
+                } else {
+                    o[2] = "Sem Conta de destino";
+                }
+                o[3] = i.getTotalTransferencia();
+                model.addRow(o);
+            }
+
+            tableListagem.clearSelection();
+            tableListagem.setModel(model);
+
+            lblFolder.setText(qtdOperacoes(conta.getListaOperacao()));
+        } catch (NenhumItemEncontrado excp) {
+            JOptionPane.showMessageDialog(new JFrame(), excp.getMessage());
+        } catch (NumberFormatException excp) {
+            JOptionPane.showMessageDialog(new JFrame(), "Coloca um numera cara");
+        }
     }
 
     private void loadContas(List<Conta> lista) {
@@ -111,9 +154,17 @@ public class ListarContas extends JFrame{
     }
 
     private String qtdContas(List<Conta> lista) {
-        if(lista.size() == 0) return "Nenhuma conta cadastrada";
-        if(lista.size() == 1) return "Mostrando a única conta cadastrada";
+        if(lista.size() == 0) return "Nenhuma "+ "conta cadastrada";
+        if(lista.size() == 1) return "Mostrando a única "+ " conta cadastrada";
         if(lista.size() >= 2) return "Mostrando as " + lista.size() + " contas cadastradas";
+
+        return "Isso nunca vai aparecer mesmo";
+    }
+
+    private String qtdOperacoes(List<Operacao> lista) {
+        if(lista.size() == 0) return "Nenhuma operação encontrada";
+        if(lista.size() == 1) return "Mostrando a única operação da conta";
+        if(lista.size() >= 2) return "Mostrando as " + lista.size() + " operações da conta";
 
         return "Isso nunca vai aparecer mesmo";
     }

@@ -1,7 +1,9 @@
 package ui;
 
 import busines.ContaBusines;
+import busines.TransferenciaBusines;
 import entity.Conta;
+import entity.Operacao;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,8 +24,10 @@ public class RealizarTransferencia extends JFrame{
     private JTextField txtNomeDestino;
     private JTextField txtBancoDestino;
     private JTextField txtValorDeposito;
+    private JLabel txtIdOperacao;
 
-    private ContaBusines mContaBusines;
+    private final ContaBusines mContaBusines;
+    private TransferenciaBusines mTransferenciaBusines;
     private Conta origem;
     private Conta destino;
 
@@ -39,6 +43,7 @@ public class RealizarTransferencia extends JFrame{
 
         setListener();
         mContaBusines = new ContaBusines();
+        txtIdOperacao.setText("" + (Operacao.Companion.getNumeroOperacao() + 1));
         btnBuscarDestino.setEnabled(false);
         btnDepositar.setEnabled(false);
     }
@@ -69,6 +74,7 @@ public class RealizarTransferencia extends JFrame{
                         txtBancoDestino.setText(destino.getBanco());
                         txtNomeDestino.setText(destino.getNomeCliente());
                         btnDepositar.setEnabled(true);
+                        btnBuscarDestino.setEnabled(false);
                     } else {
                         throw new Exception("Conta de origem igual a de destino");
                     }
@@ -82,9 +88,12 @@ public class RealizarTransferencia extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    mContaBusines.pagar(txtValorDeposito.getText(), origem, destino);
-                } catch (Exception excp) {
-
+                    mTransferenciaBusines.pagar(txtValorDeposito.getText(), origem, destino);
+                    JOptionPane.showMessageDialog(new JFrame(), "Pagamento efetuado com sucesso");
+                    new Transferencia();
+                    dispose();
+                } catch (IllegalArgumentException excp) {
+                    JOptionPane.showMessageDialog(new JFrame(), excp.getMessage());
                 }
             }
         });

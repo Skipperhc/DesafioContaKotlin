@@ -1,6 +1,9 @@
 package ui;
 
 import busines.ContaBusines;
+import entity.Conta;
+import entity.exceptions.CamposVaziosException;
+import entity.exceptions.NumeroNegativoException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +18,7 @@ public class CriarContaCorrente extends JFrame{
     private JButton btnVoltar;
     private JButton btnCriar;
     private JPanel panelPrincipal;
+    private JTextField txtIdConta;
 
     private ContaBusines mContaBusines;
 
@@ -30,6 +34,7 @@ public class CriarContaCorrente extends JFrame{
 
         setListener();
         mContaBusines = new ContaBusines();
+        txtIdConta.setText("" + (Conta.Companion.getQtdContas() + 1));
     }
 
     private void setListener() {
@@ -45,7 +50,9 @@ public class CriarContaCorrente extends JFrame{
                     mContaBusines.save(nome, saldo, banco, limite);
                     new TelaInicial();
                     dispose();
-                } catch (Exception excp) {
+                } catch (NumberFormatException excp) {
+                    JOptionPane.showMessageDialog(new JFrame(), "Insira um valor apropriado");
+                } catch (IllegalArgumentException | CamposVaziosException excp) {
                     JOptionPane.showMessageDialog(new JFrame(), excp.getMessage());
                 }
             }

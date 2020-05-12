@@ -2,24 +2,18 @@ package entity
 
 import java.util.*
 
-class Operacao private constructor() {
+class Operacao private constructor(var contaIdOrigem:Int?, val contaIdDestino:Int,
+                                   val totalTransferencia:Double, val id:Int = numeroOperacao) {
     companion object {
-        var numeroOperacao = 0
+        var numeroOperacao = 1
     }
 
-    constructor(origem:Int, valor:Double, destino:Int = 0) : this() {
-        this.id = numeroOperacao + 1
-        numeroOperacao++
-        this.contaIdOrigem = origem
-        this.contaIdDestino = destino
-        this.totalTransferencia = valor
+    fun vitor() {
+        contaIdOrigem?.div(2)
     }
-    var id:Int = 0
-        get() { return field } private set(value) { }
-    var contaIdOrigem:Int = 0
-        get() { return field } private set(value) { field = value}
-    var contaIdDestino:Int = 0
-        get() { return field } private set(value) {field = value}
-    var totalTransferencia:Double = 0.0
-        get() { return field } private set(value) {field = value}
+    
+    constructor(origem:Int, valor:Double, destino:Int = 0) :
+            this(contaIdDestino = destino,contaIdOrigem = origem, totalTransferencia = valor) {
+        numeroOperacao++
+    }
 }

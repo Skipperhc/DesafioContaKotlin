@@ -10,12 +10,16 @@ class CaixaEletronico {
     companion object {
         fun pagar(origem: Conta, valor:Double) {
             origem.saldo -= valor
-            val op = Operacao(origem.id,12.0)
+            val op = Operacao(origem.id,valor)
             origem.listaOperacao.add(op)
         }
 
         fun pagar(origem: Conta, destino: Conta, valor:Double) {
-
+            origem.saldo -= valor
+            destino.saldo += valor
+            val op = Operacao(origem.id, valor, destino.id)
+            origem.listaOperacao.add(op)
+            destino.listaOperacao.add(op)
         }
     }
 }

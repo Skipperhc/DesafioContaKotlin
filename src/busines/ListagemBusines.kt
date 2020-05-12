@@ -29,13 +29,4 @@ class ListagemBusines {
     fun listarContas() : List<Conta> {
         return ContaRepository.lista()
     }
-
-    fun qtdContas() : String {
-        var listaContas = ContaRepository.lista()
-        if(listaContas.size == 0) return "Nenhuma conta cadastrada"
-        if(listaContas.size == 1) return "Mostrando a única conta cadastrada"
-        if(listaContas.size >= 2) return "Mostrando as ${listaContas.size} contas cadastradas"
-
-        return "Isso nunca vai aparecer mesmo"
-    }
 }
